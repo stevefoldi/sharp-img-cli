@@ -11,6 +11,7 @@ const defaultConfig = {
     sizes: [800],
     formats: ["webp"],
     quality: 80,
+    dryRun: false,
 };
 
 /**

@@ -3,26 +3,50 @@ import { glob } from "glob";
 import path from "path";
 import fs from "fs/promises";
 
-export async function processImages({ input, output, sizes, format }) {
-    const files = await glob(`${input}/**/*.{jpg,jpeg,png}`);
+export async function processImages(config) {
+    const files = await glob(`${config.input}/**/*.{jpg,jpeg,png}`);
 
-    await fs.mkdir(output, { recursive: true });
+    if (!files.length) {
+        console.log("No images found.");
+        return;
+    }
+
+    let totalTasks =
+        files.length *
+        config.sizes.length *
+        config.formats.length;
+
+    let completed = 0;
 
     for (const file of files) {
+        const relativePath = path.relative(config.input, file);
+        const dir = path.dirname(relativePath);
         const filename = path.basename(file, path.extname(file));
 
-        for (const size of sizes) {
-            const outputPath = path.join(
-                output,
-                `${filename}-${size}.${format}`
-            );
+        for (const size of config.sizes) {
+            for (const format of config.formats) {
+                const outputDir = path.join(config.output, dir);
+                await fs.mkdir(outputDir, { recursive: true });
 
-            await sharp(file)
-                .resize(size)
-                .toFormat(format, { quality: 80 })
-                .toFile(outputPath);
+                const outputPath = path.join(
+                    outputDir,
+                    `${filename}-${size}.${format}`
+                );
 
-            console.log(`✔ Created: ${outputPath}`);
+                if (config.dryRun) {
+                    console.log(`[DRY RUN] Would create: ${outputPath}`);
+                } else {
+                    await sharp(file)
+                        .resize(size)
+                        .toFormat(format, { quality: config.quality })
+                        .toFile(outputPath);
+                }
+
+                completed++;
+                console.log(
+                    `[${completed}/${totalTasks}] ✔ ${outputPath}`
+                );
+            }
         }
     }
 }

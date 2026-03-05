@@ -17,11 +17,9 @@ const defaultConfig = {
         thumbnail: {
             variants: ["600x400:cover:top"],
         },
-
         large: {
             variants: ["1000x"],
         },
-
         blog: {
             variants: ["600x400:cover:top", "1000x"],
         },
@@ -44,11 +42,10 @@ async function loadUserConfig() {
 }
 
 /**
- * Merge config layers
+ * Resolve final config
  */
 export async function resolveConfig(cliOptions = {}) {
     const userConfig = await loadUserConfig();
-
     const config = {
         ...defaultConfig,
         ...userConfig,
@@ -56,19 +53,19 @@ export async function resolveConfig(cliOptions = {}) {
     };
 
     // Apply preset if provided
-    if (merged.preset) {
-        const presetConfig =
-            userConfig.presets?.[merged.preset] ||
-            defaultConfig.presets?.[merged.preset];
+    if (config.preset) {
+        const preset =
+            userConfig.presets?.[config.preset] ||
+            defaultConfig.presets?.[config.preset];
 
-        if (!presetConfig) {
-            throw new Error(`Preset "${merged.preset}" not found`);
+        if (!preset) {
+            throw new Error(`Preset "${config.preset}" not found`);
         }
 
-        Object.assign(merged, presetConfig);
+        Object.assign(config, preset);
     }
 
-    merged.variants = merged.variants ?? [];
+    config.variants = config.variants ?? [];
 
-    return merged;
+    return config;
 }

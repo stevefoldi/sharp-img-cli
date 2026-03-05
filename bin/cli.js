@@ -8,31 +8,33 @@ const program = new Command();
 
 program
     .name("imgtool")
-    .description("Reusable Sharp Image Processing CLI")
-    .version("1.0.0");
+    .description("Batch image processing CLI powered by Sharp")
+    .version("1.1.0");
 
 program
     .command("process [input] [output]")
-    .option("-s, --sizes <sizes>", "Comma separated sizes (e.g. 400,800,1200)")
-    .option("-f, --formats <formats>", "Comma separated formats (webp,avif,jpeg,png)")
-    .option("-q, --quality <quality>", "Image quality (default 80)")
-    .option("--dry-run", "Preview changes without writing files")
+    .description("Process images")
+    .option("--variant <variant...>", "Resize variant (ex: 600x400:cover:top)")
+    .option("--preset <preset>", "Use preset from config")
+    .option("--dry-run", "Preview output without writing files")
     .action(async (input, output, options) => {
-    const cliOptions = {
-            input,
-            output,
-            sizes: options.sizes
-                ? options.sizes.split(",").map(Number)
-                : undefined,
-            formats: options.formats
-                ? options.formats.split(",")
-                : undefined,
-            quality: options.quality ? Number(options.quality) : undefined,
-            dryRun: options.dryRun || false,
-        };
+        try {
+            const cliOptions = {
+                input,
+                output,
+                variants: options.variant,
+                preset: options.preset,
+                dryRun: options.dryRun,
+            };
 
-        const config = await resolveConfig(cliOptions);
-        await processImages(config);
+            const config = await resolveConfig(cliOptions);
+
+            await processImages(config);
+
+        } catch (error) {
+            console.error("Error:", error.message);
+            process.exit(1);
+        }
     });
 
 program.parse();

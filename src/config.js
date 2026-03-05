@@ -8,14 +8,28 @@ import { pathToFileURL } from "url";
 const defaultConfig = {
     input: "./images",
     output: "./dist",
-    sizes: [800],
+    variants: [],
     formats: ["webp"],
     quality: 80,
     dryRun: false,
+
+    presets: {
+        thumbnail: {
+            variants: ["600x400:cover:top"],
+        },
+
+        large: {
+            variants: ["1000x"],
+        },
+
+        blog: {
+            variants: ["600x400:cover:top", "1000x"],
+        },
+    },
 };
 
 /**
- * Load user config file if it exists
+ * Load optional project config
  */
 async function loadUserConfig() {
     const configPath = path.resolve(process.cwd(), "imgtool.config.js");
@@ -30,14 +44,31 @@ async function loadUserConfig() {
 }
 
 /**
- * Merge CLI options with config + defaults
+ * Merge config layers
  */
 export async function resolveConfig(cliOptions = {}) {
     const userConfig = await loadUserConfig();
 
-    return {
+    const config = {
         ...defaultConfig,
         ...userConfig,
         ...cliOptions,
     };
+
+    // Apply preset if provided
+    if (merged.preset) {
+        const presetConfig =
+            userConfig.presets?.[merged.preset] ||
+            defaultConfig.presets?.[merged.preset];
+
+        if (!presetConfig) {
+            throw new Error(`Preset "${merged.preset}" not found`);
+        }
+
+        Object.assign(merged, presetConfig);
+    }
+
+    merged.variants = merged.variants ?? [];
+
+    return merged;
 }

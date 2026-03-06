@@ -1,27 +1,54 @@
 # sharp-img-cli
 
+![License](https://img.shields.io/badge/license-MIT-green)
+![Node](https://img.shields.io/badge/node-%3E%3D18-blue)
+![CLI](https://img.shields.io/badge/type-CLI-orange)
+
 A fast and flexible **Node.js CLI for batch image processing** powered by **Sharp**.
 
 Resize, crop, and convert large sets of images using configurable variants, presets, and parallel processing.
 
 Perfect for:
 
-* Web developers optimizing images for websites
-* Pre-processing assets for React, WordPress, or static sites
-* Batch resizing large folders of images
+* Web developers optimizing images
+* Static site image pipelines
+* React / WordPress / Jamstack projects
+* Batch resizing image folders
+
+---
+
+# Quick Example
+
+Resize and crop images:
+
+```bash
+imgtool process ./images ./dist \
+  --variant 600x400:cover:top \
+  --variant 1000x
+```
+
+Output:
+
+```
+dist/
+  photo-600x400.webp
+  photo-1000.webp
+  image-600x400.webp
+  image-1000.webp
+```
 
 ---
 
 # Features
 
 * Batch image processing
-* Multiple resize variants in a single command
+* Multiple resize variants
 * Crop control (`top`, `center`, etc.)
 * Recursive directory scanning
-* Parallel processing for speed
-* Optional project configuration file
+* Parallel processing
+* Optional project configuration
 * Custom presets
-* Web-ready output (WebP, JPEG, PNG)
+* Web-optimized formats
 
 ---
 
@@ -56,7 +83,7 @@ imgtool --help
 
 # Basic Usage
 
-Process a folder of images:
+Process images from an input directory:
 
 ```bash
 imgtool process ./images ./dist
@@ -76,8 +103,6 @@ imgtool process ./images ./dist \
   --variant 1000x
 ```
 
-This creates:
-
 | Variant             | Description                                                 |
 | ------------------- | ----------------------------------------------------------- |
 | `600x400:cover:top` | Resize width to 600px and crop height to 400px from the top |
@@ -87,7 +112,7 @@ This creates:
 
 # Using Presets
 
-Presets allow you to reuse common resize configurations.
+Presets allow reusable image transformations.
 
 Example:
 
@@ -116,7 +141,7 @@ You can place an optional configuration file in any project.
 imgtool.config.js
 ```
 
-Example configuration:
+Example:
 
 ```javascript
 export default {
@@ -128,54 +153,29 @@ export default {
 };
 ```
 
-Now you can simply run:
+Then simply run:
 
 ```bash
 imgtool process
-```
-
----
-
-# Example Workflow
-
-Typical project structure:
-
-```
-project/
-  images/
-  dist/
-  imgtool.config.js
-```
-
-Run the CLI:
-
-```bash
-imgtool process
-```
-
-Images will automatically be processed into `/dist`.
-
----
-
-# Example Output
-
-```
-dist/
-  image-600x400.webp
-  image-1000.webp
-  photo-600x400.webp
-  photo-1000.webp
 ```
 
 ---
 
 # Development
 
-Run the CLI without linking globally:
+Run the CLI without installing globally:
 
 ```bash
 node bin/cli.js process ./images ./dist
 ```
+
+---
+
+# Documentation
+
+See the full command reference:
+
+**CHEATSHEET.md**
 
 ---
 
@@ -190,4 +190,4 @@ node bin/cli.js process ./images ./dist
 
 # License
 
-MIT License
+MIT License © 2026 Steve Foldi

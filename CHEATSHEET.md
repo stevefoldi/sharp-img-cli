@@ -98,10 +98,7 @@ Example preset definition:
 
 ```javascript
 export const presets = {
-  blog: [
-    { width: 600, height: 400, fit: "cover", position: "top" },
-    { width: 1000 }
-  ]
+	blog: [{ width: 600, height: 400, fit: "cover", position: "top" }, { width: 1000 }],
 };
 ```
 
@@ -119,11 +116,11 @@ Example:
 
 ```javascript
 export default {
-  input: "./images",
-  output: "./dist",
-  formats: ["webp"],
-  quality: 80,
-  recursive: true
+	input: "./images",
+	output: "./dist",
+	formats: ["webp"],
+	quality: 80,
+	recursive: true,
 };
 ```
 
@@ -148,8 +145,42 @@ avif
 
 Example config:
 
+```bash
+imgtool process ./images ./dist --format webp
+```
+
+Multiple formats:
+
+```bash
+imgtool process ./images ./dist --format webp png
+```
+
 ```javascript
-formats: ["webp"]
+formats: ["webp"];
+```
+
+---
+
+# Compression Only (No Resize)
+
+```bash
+imgtool process ./images ./dist \
+  --format png \
+  --no-resize
+```
+
+---
+
+# Quality Control
+
+Emample config:
+
+```bash
+imgtool process ./images ./dist --quality 60
+```
+
+```javascript
+quality: 60;
 ```
 
 ---
@@ -160,6 +191,14 @@ Process images inside nested folders:
 
 ```bash
 imgtool process ./images ./dist --recursive
+```
+
+---
+
+# Disable Recursive Processing
+
+```bash
+imgtool process ./images ./dist --no-recursive
 ```
 
 ---
@@ -184,6 +223,35 @@ Example:
 
 ```bash
 imgtool process ./images ./dist --concurrency 4
+```
+
+---
+
+# Force Reprocessing
+
+Reprocess all images (ignore skipped files):
+
+```bash
+imgtool process ./images ./dist --force
+```
+
+---
+
+# Config File
+
+```bash
+imgtool.config.js
+```
+
+Example:
+
+```js
+export default {
+	input: "./images",
+	output: "./dist",
+	formats: ["webp"],
+	quality: 80,
+};
 ```
 
 ---

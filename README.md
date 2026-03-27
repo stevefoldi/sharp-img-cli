@@ -10,10 +10,10 @@ Resize, crop, and convert large sets of images using configurable variants, pres
 
 Perfect for:
 
-* Web developers optimizing images
-* Static site image pipelines
-* React / WordPress / Jamstack projects
-* Batch resizing image folders
+- Web developers optimizing images
+- Static site image pipelines
+- React / WordPress / Jamstack projects
+- Batch resizing image folders
 
 ---
 
@@ -41,14 +41,16 @@ dist/
 
 # Features
 
-* Batch image processing
-* Multiple resize variants
-* Crop control (`top`, `center`, etc.)
-* Recursive directory scanning
-* Parallel processing
-* Optional project configuration
-* Custom presets
-* Web-optimized formats
+- Batch image processing
+- Multiple resize variants
+- Crop control (`top`, `center`, etc.)
+- Format conversion (`webp`, `png`, `jpeg`, etc.)
+- Compression without resizing (`--no-resize`)
+- Recursive directory scanning
+- Parallel processing
+- Optional project configuration
+- Custom presets
+- Progress bar output
 
 ---
 
@@ -110,6 +112,34 @@ imgtool process ./images ./dist \
 
 ---
 
+# Format Conversion
+
+Convert images to another format:
+
+```bash
+imgtool process ./images ./dist --format webp
+```
+
+Multiple formats:
+
+```bash
+imgtool process ./images ./dist --format webp png
+```
+
+---
+
+# Compression Only (No Resize)
+
+Keep original dimensions:
+
+```bash
+imgtool process ./images ./dist \
+  --format png \
+  --no-resize
+```
+
+---
+
 # Using Presets
 
 Presets allow reusable image transformations.
@@ -124,11 +154,24 @@ Example preset definition:
 
 ```javascript
 export const presets = {
-  blog: [
-    { width: 600, height: 400, fit: "cover", position: "top" },
-    { width: 1000 }
-  ]
+	blog: [{ width: 600, height: 400, fit: "cover", position: "top" }, { width: 1000 }],
 };
+```
+
+Default presets:
+
+```js
+presets: {
+  thumbnail: {
+    variants: ["600x400:cover:top"]
+  },
+  large: {
+    variants: ["1000x"]
+  },
+  blog: {
+    variants: ["600x400:cover:top", "1000x"]
+  }
+}
 ```
 
 ---
@@ -137,7 +180,7 @@ export const presets = {
 
 You can place an optional configuration file in any project.
 
-```
+```bash
 imgtool.config.js
 ```
 
@@ -145,11 +188,11 @@ Example:
 
 ```javascript
 export default {
-  input: "./images",
-  output: "./dist",
-  formats: ["webp"],
-  quality: 80,
-  recursive: true
+	input: "./images",
+	output: "./dist",
+	formats: ["webp"],
+	quality: 80,
+	recursive: true,
 };
 ```
 
@@ -161,13 +204,39 @@ imgtool process
 
 ---
 
+# CLI Options
+
+| Option           | Description         |
+| ---------------- | ------------------- |
+| `--variant`      | Resize variants     |
+| `--preset`       | Use preset          |
+| `--format`       | Output formats      |
+| `--quality`      | Compression quality |
+| `--concurrency`  | Parallel processing |
+| `--dry-run`      | Preview only        |
+| `--no-recursive` | Disable subfolders  |
+| `--no-resize`    | Disable resizing    |
+
+---
+
+## Force Reprocessing
+
+By default, existing images are skipped to improve performance.
+
+To reprocess all images, use:
+
+````bash
+imgtool process ./images ./dist --force
+
+---
+
 # Development
 
 Run the CLI without installing globally:
 
 ```bash
 node bin/cli.js process ./images ./dist
-```
+````
 
 ---
 
@@ -181,10 +250,11 @@ See the full command reference:
 
 # Tech Stack
 
-* Node.js
-* Sharp
-* Commander
-* Glob
+- Node.js
+- Sharp
+- Commander
+- Glob
+- cli-progress
 
 ---
 

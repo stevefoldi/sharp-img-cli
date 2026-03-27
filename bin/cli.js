@@ -6,35 +6,41 @@ import { processImages } from "../src/processor.js";
 
 const program = new Command();
 
-program
-    .name("imgtool")
-    .description("Batch image processing CLI powered by Sharp")
-    .version("1.1.0");
+program.name("imgtool").description("Batch image processing CLI powered by Sharp").version("1.2.0");
 
 program
-    .command("process [input] [output]")
-    .description("Process images")
-    .option("--variant <variant...>", "Resize variant (ex: 600x400:cover:top)")
-    .option("--preset <preset>", "Use preset from config")
-    .option("--dry-run", "Preview output without writing files")
-    .action(async (input, output, options) => {
-        try {
-            const cliOptions = {
-                input,
-                output,
-                variants: options.variant,
-                preset: options.preset,
-                dryRun: options.dryRun,
-            };
+	.command("process [input] [output]")
+	.description("Process images")
+	.option("-v, --variant <variant...>", "Resize variant (e.g. 600x400:cover:top)")
+	.option("-p, --preset <preset>", "Use preset from config")
+	.option("-f, --format <format...>", "Output format(s) (webp, png, jpeg)")
+	.option("-q, --quality <number>", "Image quality (default: 80)", parseInt)
+	.option("-c, --concurrency <number>", "Number of parallel jobs (default: 5)", parseInt)
+	.option("--dry-run", "Preview output without writing files")
+	.option("--no-recursive", "Disable recursive directory processing")
+	.option("--no-resize", "Disable resizing (compress/convert only)")
+	.action(async (input, output, options) => {
+		try {
+			const cliOptions = {
+				input,
+				output,
+				variants: options.variant,
+				preset: options.preset,
+				formats: options.format,
+				quality: options.quality,
+				concurrency: options.concurrency,
+				recursive: options.recursive,
+				dryRun: options.dryRun,
+				noResize: options.resize === false,
+			};
 
-            const config = await resolveConfig(cliOptions);
+			const config = await resolveConfig(cliOptions);
 
-            await processImages(config);
-
-        } catch (error) {
-            console.error("Error:", error.message);
-            process.exit(1);
-        }
-    });
+			await processImages(config);
+		} catch (error) {
+			console.error("Error:", error.message);
+			process.exit(1);
+		}
+	});
 
 program.parse();

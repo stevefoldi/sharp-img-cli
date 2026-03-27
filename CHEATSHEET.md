@@ -227,6 +227,16 @@ imgtool process ./images ./dist --concurrency 4
 
 ---
 
+# Force Reprocessing
+
+Reprocess all images (ignore skipped files):
+
+```bash
+imgtool process ./images ./dist --force
+```
+
+---
+
 # Config File
 
 ```bash

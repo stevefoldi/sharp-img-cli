@@ -19,6 +19,7 @@ program
 	.option("--dry-run", "Preview output without writing files")
 	.option("--no-recursive", "Disable recursive directory processing")
 	.option("--no-resize", "Disable resizing (compress/convert only)")
+	.option("--force", "Reprocess all images (ignore existing output)")
 	.action(async (input, output, options) => {
 		try {
 			const cliOptions = {
@@ -32,6 +33,7 @@ program
 				recursive: options.recursive,
 				dryRun: options.dryRun,
 				noResize: options.resize === false,
+				force: options.force,
 			};
 
 			const config = await resolveConfig(cliOptions);

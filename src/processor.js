@@ -19,7 +19,7 @@ function parseVariant(str) {
 	};
 }
 
-async function processSingleImage(file, config, variantList) {
+async function processSingleImage(file, config, variantList, stats) {
 	const { input, output, formats, quality, dryRun } = config;
 	const relativePath = path.relative(input, file);
 	const dir = path.dirname(relativePath);
@@ -57,7 +57,19 @@ async function processSingleImage(file, config, variantList) {
 				});
 			}
 
+			if (!config.force) {
+				// Skip if file already exists
+				try {
+					await fs.access(outputPath);
+					stats.skipped++;
+					return;
+				} catch {
+					// file does not exist → continue
+				}
+			}
+
 			await image.toFormat(format, { quality }).toFile(outputPath);
+			stats.processed++;
 
 			//console.log("✓", outputPath);
 		}
@@ -70,6 +82,9 @@ export async function processImages(config) {
 	const pattern = recursive ? `${input}/**/*.{jpg,jpeg,png,webp}` : `${input}/*.{jpg,jpeg,png,webp}`;
 
 	const files = await glob(pattern);
+
+	let processedCount = 0;
+	let skippedCount = 0;
 
 	if (files.length === 0) {
 		console.log("No images found.");
@@ -99,6 +114,11 @@ export async function processImages(config) {
 
 	bar.start(files.length, 0);
 
+	const stats = {
+		processed: 0,
+		skipped: 0,
+	};
+
 	const workers = Array(concurrency)
 		.fill(null)
 		.map(async () => {
@@ -106,8 +126,10 @@ export async function processImages(config) {
 				const file = queue.shift();
 				if (!file) break;
 
-				await processSingleImage(file, config, variantList);
-				bar.increment({ file: path.basename(file) });
+				await processSingleImage(file, config, variantList, stats);
+				bar.increment({
+					file: `${path.basename(file)} (${stats.processed}✓ ${stats.skipped}↺)`,
+				});
 			}
 		});
 
@@ -115,5 +137,10 @@ export async function processImages(config) {
 
 	bar.stop();
 
-	console.log(`\n✔ Processed ${files.length} images`);
+	if (config.force) {
+		console.log("\n⚠ Force mode enabled (no skipping)");
+	}
+
+	console.log(`\n✔ Processed: ${stats.processed}`);
+	console.log(`✔ Skipped: ${stats.skipped}`);
 }

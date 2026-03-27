@@ -219,13 +219,24 @@ imgtool process
 
 ---
 
+## Force Reprocessing
+
+By default, existing images are skipped to improve performance.
+
+To reprocess all images, use:
+
+````bash
+imgtool process ./images ./dist --force
+
+---
+
 # Development
 
 Run the CLI without installing globally:
 
 ```bash
 node bin/cli.js process ./images ./dist
-```
+````
 
 ---
 
